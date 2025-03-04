@@ -18,6 +18,19 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->handleGateway();
+    }
+
+    /**
+     * Bootstrap any application services.
+     */
+    public function boot(): void
+    {
+        //
+    }
+
+    protected function handleGateway(): void
+    {
         $gateways = config('gateway.gateways');
 
         foreach ($gateways as $gateway => $gatewayClass) {
@@ -30,7 +43,7 @@ class AppServiceProvider extends ServiceProvider
             ->give(function () {
                 $request = $this->app->make(Request::class);
 
-                $gateway = $request->input('gateway');
+                $gateway = $request->input('gateway', 'unknown');
 
                 $gatewayKey = "payment.gateway.$gateway";
                 if (!$this->app->bound($gatewayKey)) {
@@ -39,13 +52,5 @@ class AppServiceProvider extends ServiceProvider
 
                 return $this->app->make($gatewayKey);
             });
-    }
-
-    /**
-     * Bootstrap any application services.
-     */
-    public function boot(): void
-    {
-        //
     }
 }
