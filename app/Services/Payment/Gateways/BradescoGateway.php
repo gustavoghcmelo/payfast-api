@@ -2,18 +2,25 @@
 
 namespace App\Services\Payment\Gateways;
 
+use App\Dto\Core\MethodResponse;
 use App\Services\Payment\Contracts\PaymentGatewayInterface;
 use Illuminate\Support\Str;
 
 class BradescoGateway implements PaymentGatewayInterface
 {
-    public function charge(array $data): array
+    public function charge(array $data): MethodResponse
     {
-        return ['status' => 'success', 'transaction_id' => 'bradesco_' . Str::uuid()->toString()];
+        return new MethodResponse(
+            null,
+            ['transactionId' => 'Bradesco_' . Str::uuid()->toString()]
+        );
     }
 
-    public function refund(string $transactionId): array
+    public function refund(string $transactionId): MethodResponse
     {
-        return ['status' => 'refunded'];
+        return new MethodResponse(
+            null,
+            ['transactionId' => $transactionId]
+        );
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Services\Payment;
 
+use App\Dto\Core\MethodResponse;
 use App\Services\Payment\Contracts\PaymentGatewayInterface;
 
 class PaymentService
@@ -14,11 +15,11 @@ class PaymentService
 
     public function charge(array $data): array
     {
-        return $this->gateway->charge($data);
+        return $this->gateway->charge($data)->toArray();
     }
 
     public function refund(string $transactionId): array
     {
-        return $this->gateway->refund($transactionId);
+        return $this->gateway->refund($transactionId)->toArray();
     }
 }
