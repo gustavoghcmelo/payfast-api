@@ -14,7 +14,11 @@ class ApiResponse
      * @param int $statusCode
      * @return JsonResponse
      */
-    public static function success($data = null, string $message = '', int $statusCode = 200): JsonResponse
+    public static function success(
+        array|null $data = null,
+        int $statusCode = 200,
+        null|string $message = 'Requisição finalizada com sucesso.',
+    ): JsonResponse
     {
         return response()->json([
             'status' => 'success',
@@ -31,7 +35,11 @@ class ApiResponse
      * @param int $statusCode
      * @return JsonResponse
      */
-    public static function error(string $message = '', array $errors = [], int $statusCode = 400): JsonResponse
+    public static function error(
+        string $message = 'Não foi possível executar sua requisição. Verifique os detalhes do erro.',
+        array $errors = [],
+        int $statusCode = 400
+    ): JsonResponse
     {
         return response()->json([
             'status' => 'error',

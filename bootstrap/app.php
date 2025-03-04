@@ -5,6 +5,10 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
+use Illuminate\Validation\ValidationException;
+use App\Exceptions\GatewayNotFoundException;
+use App\Helpers\ApiResponse;
+use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -20,5 +24,16 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        $exceptions->render(function (ValidationException $exception, Request $request) {
+            if ($request->is('api/*')) {
+                return ApiResponse::error($exception->getMessage(), $exception->errors());
+            }
+        });
+
+        $exceptions->render(function (GatewayNotFoundException $exception, Request $request) {
+            if ($request->is('api/*')) {
+                return ApiResponse::error($exception->getMessage());
+            }
+        });
+
     })->create();

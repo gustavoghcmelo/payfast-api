@@ -4,9 +4,6 @@ namespace App\Providers;
 
 use App\Exceptions\InvalidGatewayException;
 use App\Services\Payment\Contracts\PaymentGatewayInterface;
-use App\Services\Payment\Gateways\BradescoGateway;
-use App\Services\Payment\Gateways\CieloGateway;
-use App\Services\Payment\Gateways\InterGateway;
 use App\Services\Payment\PaymentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\ServiceProvider;
