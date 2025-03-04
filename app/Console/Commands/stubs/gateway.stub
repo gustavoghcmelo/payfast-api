@@ -1,0 +1,26 @@
+<?php
+
+namespace App\Services\Payment\Gateways;
+
+use App\Services\Payment\Contracts\PaymentGatewayInterface;
+use Illuminate\Support\Str;
+
+class {{GatewayName}}Gateway implements PaymentGatewayInterface
+{
+    public function charge(array $data): array
+    {
+        // Implemente a lógica de cobrança aqui
+        return [
+            'status' => 'success',
+            'transaction_id' => '{{GatewayName}}_' . Str::uuid()->toString(),
+        ];
+    }
+
+    public function refund(string $transactionId): array
+    {
+        // Implemente a lógica de reembolso aqui
+        return [
+            'status' => 'success',
+        ];
+    }
+}
