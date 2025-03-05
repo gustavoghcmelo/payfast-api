@@ -68,7 +68,13 @@ test('on delete a transaction_type should return ApiResponse::success structure 
     $transaction_type = TransactionType::factory()->create();
     $response = $this->delete("/api/v1/transaction-type/$transaction_type->id");
 
+    assertApiResponseSuccess($response);
+});
+
+test('after delete the deleted_at column not be null', function () {
+    $transaction_type = TransactionType::factory()->create();
+    $this->delete("/api/v1/transaction-type/$transaction_type->id");
+
     $transaction_type->refresh();
     expect($transaction_type->deleted_at)->not()->toBeNull();
-    assertApiResponseSuccess($response);
 });

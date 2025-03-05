@@ -100,13 +100,17 @@ test('on update should not throw ValidationException if not description field ex
 
 test('on delete a gateway should return ApiResponse::success structure and status 200 ', function () {
     $gateway = Gateway::factory()->create();
-
     $response = $this->delete("/api/v1/gateway/$gateway->id");
 
-    $gateway->refresh();
-
-    expect($gateway->deleted_at)->not()->toBeNull();
     assertApiResponseSuccess($response);
+});
+
+test('after delete the deleted_at column not be null', function () {
+    $gateway = Gateway::factory()->create();
+    $this->delete("/api/v1/gateway/$gateway->id");
+
+    $gateway->refresh();
+    expect($gateway->deleted_at)->not()->toBeNull();
 });
 
 
