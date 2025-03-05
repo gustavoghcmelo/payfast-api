@@ -37,7 +37,7 @@ class Gateway extends Model
      */
     public static function edit(array $data, int $gateway_id): Gateway
     {
-        if (!self::isValidGateway($gateway_id)) {
+        if (!Gateway::where('id', $gateway_id)->exists()) {
             throw new GatewayNotFoundException($gateway_id);
         }
 
@@ -60,18 +60,5 @@ class Gateway extends Model
         }
 
         return Gateway::withTrashed()->find($gateway_id);
-    }
-
-    public static function isValidGateway(int $gateway_id = null, string $gateway_slug = null): bool
-    {
-        return DB::table('gateways')
-            ->when($gateway_id, function (Builder $query, string $slug) {
-                return $query->where('slug', $slug);
-            })
-            ->when($gateway_slug, function (Builder $query, string $id) {
-                return $query->where('id', $id);
-            })
-            ->where('deleted_at', null)
-            ->exists();
     }
 }
