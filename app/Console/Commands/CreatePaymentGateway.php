@@ -64,7 +64,8 @@ class CreatePaymentGateway extends Command
             return;
         }
 
-        $newGatewayEntry = "        '$gatewaySlug' => \\App\\Services\\Payment\\Gateways\\{$gatewayName}Gateway::class,";
+        $slug = Str::slug($gatewaySlug);
+        $newGatewayEntry = "        '$slug' => \\App\\Services\\Payment\\Gateways\\{$gatewayName}Gateway::class,";
         $configContent = preg_replace(
             '/\'gateways\' => \[/',
             "'gateways' => [\n$newGatewayEntry",

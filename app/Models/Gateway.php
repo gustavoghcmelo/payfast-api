@@ -32,9 +32,12 @@ class Gateway extends Model
             ->cursorPaginate($queryParams['limit']);
     }
 
+    /**
+     * @throws GatewayNotFoundException
+     */
     public static function edit(array $data, int $gateway_id): Gateway
     {
-        if (!DB::table('gateways')->where('id', $gateway_id)->where('deleted_at', null)->exists()) {
+        if (!self::isValidGateway($gateway_id)) {
             throw new GatewayNotFoundException($gateway_id);
         }
 
@@ -45,6 +48,9 @@ class Gateway extends Model
         return Gateway::find($gateway_id);
     }
 
+    /**
+     * @throws GatewayNotFoundException
+     */
     public static function remove(int $gateway_id): Gateway
     {
         $deleted = Gateway::destroy($gateway_id);
@@ -54,5 +60,18 @@ class Gateway extends Model
         }
 
         return Gateway::withTrashed()->find($gateway_id);
+    }
+
+    public static function isValidGateway(int $gateway_id = null, string $gateway_slug = null): bool
+    {
+        return DB::table('gateways')
+            ->when($gateway_id, function (Builder $query, string $slug) {
+                return $query->where('slug', $slug);
+            })
+            ->when($gateway_slug, function (Builder $query, string $id) {
+                return $query->where('id', $id);
+            })
+            ->where('deleted_at', null)
+            ->exists();
     }
 }

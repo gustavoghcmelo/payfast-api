@@ -7,6 +7,7 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Illuminate\Validation\ValidationException;
 use App\Exceptions\GatewayNotFoundException;
+use App\Exceptions\InvalidGatewayException;
 use App\Helpers\ApiResponse;
 use Illuminate\Http\Request;
 
@@ -31,6 +32,12 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         $exceptions->render(function (GatewayNotFoundException $exception, Request $request) {
+            if ($request->is('api/*')) {
+                return ApiResponse::error($exception->getMessage());
+            }
+        });
+
+        $exceptions->render(function (InvalidGatewayException $exception, Request $request) {
             if ($request->is('api/*')) {
                 return ApiResponse::error($exception->getMessage());
             }
