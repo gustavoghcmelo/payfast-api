@@ -10,7 +10,7 @@ class ApiResponse
      * Retorna uma resposta de sucesso.
      *
      * @param mixed $data
-     * @param string $message
+     * @param null|string $message
      * @param int $statusCode
      * @return JsonResponse
      */

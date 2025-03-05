@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Exceptions\GatewayNotFoundException;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Query\Builder;
@@ -11,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 
 class Gateway extends Model
 {
-    use SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'gateways';
     protected $fillable = [

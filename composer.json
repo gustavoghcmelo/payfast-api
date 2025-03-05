@@ -30,6 +30,7 @@
     "autoload": {
         "files": [
             "app/Helpers/ApiResponse.php",
+            "app/Helpers/TestHelpers.php",
             "app/Dto/Core/MethodResponse.php"
         ],
         "psr-4": {
