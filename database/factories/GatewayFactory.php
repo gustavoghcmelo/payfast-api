@@ -21,4 +21,11 @@ class GatewayFactory extends Factory
             'description' => fake()->name(),
         ];
     }
+
+    public function deleted(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'deleted_at' => now(),
+        ]);
+    }
 }

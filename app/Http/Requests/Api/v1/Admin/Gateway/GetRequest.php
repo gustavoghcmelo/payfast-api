@@ -23,7 +23,7 @@ class GetRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'slug' => 'alpha_num:ascii|nullable',
+            'slug' => 'string|nullable',
             'description' => 'string|nullable',
             'limit' => 'integer|nullable',
         ];

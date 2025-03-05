@@ -42,7 +42,7 @@ return Application::configure(basePath: dirname(__DIR__))
             Log::channel('admin')->error($exception->getMessage(), $request->all());
 
             if ($request->is('api/*')) {
-                return ApiResponse::error($exception->getMessage());
+                return ApiResponse::error($exception->getMessage(), [], $exception->getCode());
             }
         });
 
@@ -51,7 +51,7 @@ return Application::configure(basePath: dirname(__DIR__))
             Log::channel('admin')->error($exception->getMessage(), $request->all());
 
             if ($request->is('api/*')) {
-                return ApiResponse::error($exception->getMessage());
+                return ApiResponse::error($exception->getMessage(), [], $exception->getCode());
             }
         });
 
@@ -60,7 +60,7 @@ return Application::configure(basePath: dirname(__DIR__))
             Log::channel('admin')->error($exception->getMessage(), $request->all());
 
             if ($request->is('api/*')) {
-                return ApiResponse::error($exception->getMessage());
+                return ApiResponse::error($exception->getMessage(), [], $exception->getCode());
             }
         });
 
@@ -69,7 +69,7 @@ return Application::configure(basePath: dirname(__DIR__))
             Log::channel('payment')->error($exception->getMessage(), $request->all());
 
             if ($request->is('api/*')) {
-                return ApiResponse::error($exception->getMessage());
+                return ApiResponse::error($exception->getMessage(), [], $exception->getCode());
             }
         });
 
