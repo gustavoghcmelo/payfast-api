@@ -29,7 +29,7 @@ class CreatePaymentGateway extends Command
     {
         $name = $this->argument('name');
         $gatewayName = Str::studly($name);
-        $gatewaySlug = Str::snake($gatewayName);
+        $gatewaySlug = Str::kebab($gatewayName);
 
         $this->createGatewayClass($gatewayName);
 

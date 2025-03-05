@@ -24,3 +24,16 @@ function assertApiResponseError($response, int $code = 400, array $errorsStructu
             'code' => $code,
         ]);
 }
+
+function removeLineByPassKey($arquivo, $palavra): void {
+    $lines = file($arquivo, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    $file = fopen($arquivo, 'w');
+
+    foreach ($lines as $linha) {
+        if (strpos($linha, $palavra) === false) {
+            fwrite($file, $linha . PHP_EOL);
+        }
+    }
+
+    fclose($file);
+}
