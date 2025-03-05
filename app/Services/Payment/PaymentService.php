@@ -2,7 +2,6 @@
 
 namespace App\Services\Payment;
 
-use App\Dto\Core\MethodResponse;
 use App\Services\Payment\Contracts\PaymentGatewayInterface;
 
 class PaymentService
