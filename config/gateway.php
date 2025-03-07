@@ -1,6 +1,6 @@
 <?php
 return [
     'gateways' => [
-        'bradesco' => \App\Services\Payment\Gateways\BradescoGateway::class,
+        'bradesco' => \App\Gateways\BradescoGateway::class,
     ],
 ];

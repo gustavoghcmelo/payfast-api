@@ -3,21 +3,24 @@
 namespace App\Exceptions;
 
 use Exception;
-use App\Helpers\ApiResponse;
 use Illuminate\Http\Request;
+use App\Helpers\ApiResponse;
 use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 
-class GatewayNotFoundException extends Exception
+class CheckStatusTransactionException extends Exception
 {
-    protected $code = Response::HTTP_NOT_FOUND;
+    protected $code = Response::HTTP_UNPROCESSABLE_ENTITY;
 
     protected $message = "";
 
-    public function __construct(protected string $gateway)
+    public function __construct(
+        protected string $transaction_id,
+        protected string $error
+    )
     {
-        $this->message = "Gateway ID: $gateway não foi encontrado.";
+        $this->message = "Falha na consulta da transação: $transaction_id com erro: $error";
         parent::__construct($this->message, $this->code);
     }
 

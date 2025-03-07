@@ -6,7 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
-class CreatePaymentGateway extends Command
+class CreateGateway extends Command
 {
     /**
      * The name and signature of the console command.
@@ -46,7 +46,7 @@ class CreatePaymentGateway extends Command
         $stub = File::get(app_path('Console/Commands/stubs/gateway.stub'));
         $stub = str_replace('{{GatewayName}}', $gatewayName, $stub);
 
-        $path = app_path("Services/Payment/Gateways/{$gatewayName}Gateway.php");
+        $path = app_path("Gateways/{$gatewayName}Gateway.php");
 
         File::ensureDirectoryExists(dirname($path));
         File::put($path, $stub);
@@ -65,7 +65,7 @@ class CreatePaymentGateway extends Command
         }
 
         $slug = Str::slug($gatewaySlug);
-        $newGatewayEntry = "        '$slug' => \\App\\Services\\Payment\\Gateways\\{$gatewayName}Gateway::class,";
+        $newGatewayEntry = "        '$slug' => \\App\\Gateways\\{$gatewayName}Gateway::class,";
         $configContent = preg_replace(
             '/\'gateways\' => \[/',
             "'gateways' => [\n$newGatewayEntry",
@@ -78,7 +78,7 @@ class CreatePaymentGateway extends Command
 
     protected function gatewayClassExists(string $gatewayName): bool
     {
-        $path = app_path("Services/Payment/Gateways/{$gatewayName}Gateway.php");
+        $path = app_path("Gateways/{$gatewayName}Gateway.php");
         return File::exists($path);
     }
 }

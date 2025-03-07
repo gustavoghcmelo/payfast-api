@@ -1,10 +1,10 @@
 <?php
 
-use App\Dto\Core\MethodResponse;
+use App\Dto\Core\TransactionResponse;
 
-test('should return a new array from MethodResponse structure', function () {
+test('should return a new array from TransactionResponse structure', function () {
 
-    $response = new MethodResponse([], []);
+    $response = new TransactionResponse([], []);
     $arrayResponse = $response->toArray();
 
     expect($arrayResponse)->toEqual(["error" => [], "data" => []]);
@@ -13,7 +13,7 @@ test('should return a new array from MethodResponse structure', function () {
 
 test('should accept a null error value', function () {
 
-    $response = new MethodResponse(null, ['message' => 'test data']);
+    $response = new TransactionResponse(null, ['message' => 'test data']);
     $arrayResponse = $response->toArray();
 
     expect($arrayResponse)->toEqual(["error" => null, "data" => ['message' => 'test data']]);
@@ -22,7 +22,7 @@ test('should accept a null error value', function () {
 
 test('should accept a null data value', function () {
 
-    $response = new MethodResponse(['message' => 'teste error'], null);
+    $response = new TransactionResponse(['message' => 'teste error'], null);
     $arrayResponse = $response->toArray();
 
     expect($arrayResponse)->toEqual(["error" => ['message' => 'teste error'], "data" => null]);

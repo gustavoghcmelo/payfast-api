@@ -2,18 +2,18 @@
 
 namespace App\Dto\Core;
 
-class MethodResponse
+class CheckStatusTransactionResponse
 {
     public function __construct(
-        protected array|null $error,
+        protected string|null $error,
         protected array|null $data,
     ) {}
 
     public function toArray(): array
     {
         return [
-            'error' => $this->error,
-            'data' => $this->data,
+            $this->error,
+            $this->data,
         ];
     }
 }

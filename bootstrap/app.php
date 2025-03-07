@@ -6,13 +6,12 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Illuminate\Validation\ValidationException;
-use App\Exceptions\GatewayNotFoundException;
-use App\Exceptions\TransactionTypeNotFoundException;
-use App\Exceptions\UserNotFoundException;
-use App\Exceptions\InvalidGatewayException;
+use Illuminate\Database\QueryException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Illuminate\Support\Facades\Log;
 use App\Helpers\ApiResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -30,46 +29,28 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->render(function (ValidationException $exception, Request $request) {
 
-            Log::error($exception->getMessage(), $request->all());
+            Log::channel('admin')->error($exception->getMessage(), $request->all());
 
             if ($request->is('api/*')) {
                 return ApiResponse::error($exception->getMessage(), $exception->errors());
             }
         });
 
-        $exceptions->render(function (GatewayNotFoundException $exception, Request $request) {
+        $exceptions->render(function (QueryException $exception, Request $request) {
 
             Log::channel('admin')->error($exception->getMessage(), $request->all());
 
             if ($request->is('api/*')) {
-                return ApiResponse::error($exception->getMessage(), [], $exception->getCode());
+                return ApiResponse::error($exception->getMessage(), [], Response::HTTP_INTERNAL_SERVER_ERROR);
             }
         });
 
-        $exceptions->render(function (TransactionTypeNotFoundException $exception, Request $request) {
+        $exceptions->render(function (NotFoundHttpException $exception, Request $request) {
 
             Log::channel('admin')->error($exception->getMessage(), $request->all());
 
             if ($request->is('api/*')) {
-                return ApiResponse::error($exception->getMessage(), [], $exception->getCode());
-            }
-        });
-
-        $exceptions->render(function (UserNotFoundException $exception, Request $request) {
-
-            Log::channel('admin')->error($exception->getMessage(), $request->all());
-
-            if ($request->is('api/*')) {
-                return ApiResponse::error($exception->getMessage(), [], $exception->getCode());
-            }
-        });
-
-        $exceptions->render(function (InvalidGatewayException $exception, Request $request) {
-
-            Log::channel('payment')->error($exception->getMessage(), $request->all());
-
-            if ($request->is('api/*')) {
-                return ApiResponse::error($exception->getMessage(), [], $exception->getCode());
+                return ApiResponse::error($exception->getMessage(), [], Response::HTTP_NOT_FOUND);
             }
         });
 

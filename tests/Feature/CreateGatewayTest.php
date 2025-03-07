@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\File;
 test('should create a new payment gateway class and add line into config file', function () {
 
     $gatewayName = 'GatewayTesteUm';
-    $filePath = app_path("Services/Payment/Gateways/{$gatewayName}Gateway.php");
+    $filePath = app_path("Gateways/{$gatewayName}Gateway.php");
 
     $this->artisan("make:gateway $gatewayName")
         ->expectsOutput("Classe do gateway criada em: $filePath")
@@ -28,7 +28,7 @@ test('after command execution should be exist Gateway Class on Services/Gateways
 
     $gatewayName = 'GatewayTesteUm';
 
-    $filePath = app_path("Services/Payment/Gateways/{$gatewayName}Gateway.php");
+    $filePath = app_path("Gateways/{$gatewayName}Gateway.php");
     expect(File::exists($filePath))->toBeTrue();
 });
 
@@ -45,6 +45,6 @@ test('after command execution should be contain Gateway data on gateway.php conf
     removeLineByPassKey($config_file_path, $gatewaySlug);
 
     // Removendo class do gateway teste um
-    $filePath = app_path("Services/Payment/Gateways/{$gatewayName}Gateway.php");
+    $filePath = app_path("Gateways/{$gatewayName}Gateway.php");
     File::delete($filePath);
 });

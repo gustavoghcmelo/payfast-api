@@ -127,9 +127,9 @@ return [
             'path' => storage_path('logs/laravel.log'),
         ],
 
-        'payment' => [
+        'transaction' => [
             'driver' => 'daily',
-            'path' => storage_path('logs/payment.log'),
+            'path' => storage_path('logs/transaction.log'),
             'level' => 'info',
         ],
 
