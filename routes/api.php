@@ -1,16 +1,12 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
 
-Route::prefix('v1')->group(function () {
+Route::post('/auth/token', [AuthenticatedSessionController::class, 'authenticate_api']);
 
-    /**
-     * Rotas Administrativas do sistema
-     */
+Route::middleware('auth:sanctum')->group(function () {
+
     require __DIR__ . "/api/v1/admin.php";
-
-    /**
-     * Rotas das transações financeiras
-     */
     require __DIR__ . "/api/v1/transaction.php";
 });

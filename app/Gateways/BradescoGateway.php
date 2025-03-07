@@ -2,12 +2,13 @@
 
 namespace App\Gateways;
 
-use App\Contracts\GatewayInterface;
-use App\Dto\Core\CheckStatusTransactionResponse;
-use App\Dto\Core\GatewayAuthResponse;
-use App\Dto\Core\TransactionResponse;
 use App\Models\Transaction;
 use Illuminate\Support\Str;
+use App\Contracts\GatewayInterface;
+use App\Dto\Core\GatewayAuthResponse;
+use App\Dto\Core\TransactionResponse;
+use App\Dto\Core\CheckStatusTransactionResponse;
+
 class BradescoGateway implements GatewayInterface
 {
     public function authenticate(): GatewayAuthResponse
@@ -21,7 +22,7 @@ class BradescoGateway implements GatewayInterface
     public function pix_imediato(string $access_token, array $data): TransactionResponse
     {
         return new TransactionResponse(
-            'O BANCO FECHOU E FUDEU TUDO',
+            null,
             ['BRADESCO' => Str::uuid()->toString()],
             'TRANSACAO_SCAFOLDING_23H4HVHBHBRH34',
             'CONCLUIDA'
