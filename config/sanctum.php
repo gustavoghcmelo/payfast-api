@@ -46,7 +46,7 @@ return [
     |
     */
 
-    'expiration' => null,
+    'expiration' => 5, // TOKEN EXPIRA EM 5 MINUTOS
 
     /*
     |--------------------------------------------------------------------------
