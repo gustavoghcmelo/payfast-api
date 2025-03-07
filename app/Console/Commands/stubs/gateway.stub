@@ -1,14 +1,15 @@
 <?php
 
-namespace App\Services\Payment\Gateways;
+namespace App\Gateways;
 
-use App\Dto\Core\TransactionResponse;
-use App\Dto\Core\GatewayAuthResponse;
-use App\Contracts\GatewayInterface;
 use App\Models\Transaction;
 use Illuminate\Support\Str;
+use App\Contracts\GatewayInterface;
+use App\Dto\Core\TransactionResponse;
+use App\Dto\Core\GatewayAuthResponse;
+use App\Dto\Core\CheckStatusTransactionResponse;
 
-class {{GatewayName}}Gateway implements GatewayInterface
+class PaypalGateway implements GatewayInterface
 {
     public function authenticate(): GatewayAuthResponse
     {
@@ -18,59 +19,69 @@ class {{GatewayName}}Gateway implements GatewayInterface
         );
     }
 
-    public function pix_imediato(array $data): TransactionResponse
+    public function pix_imediato(string $access_token, array $data): TransactionResponse
     {
         return new TransactionResponse(
             null,
-            ['transactionId' => '{{GatewayName}}_pix_imediato_' . Str::uuid()->toString()]
+            ['{{GatewayName}}' => Str::uuid()->toString()],
+            'TRANSACAO_SCAFOLDING_23H4HVHBHBRH34',
+            'CONCLUIDA'
         );
     }
 
-    public function pix_vencimento(array $data): TransactionResponse
+    public function pix_vencimento(string $access_token, array $data): TransactionResponse
     {
         return new TransactionResponse(
             null,
-            ['transactionId' => '{{GatewayName}}_pix_vencimento_' . Str::uuid()->toString()]
+            ['{{GatewayName}}' => Str::uuid()->toString()],
+            'TRANSACAO_SCAFOLDING_23H4HVHBHBRH34',
+            'CONCLUIDA'
         );
     }
 
-    public function consulta_pix(Transaction $transaction): TransactionResponse
+    public function consulta_pix(string $access_token, Transaction $transaction): CheckStatusTransactionResponse
     {
-        return new TransactionResponse(
+        return new CheckStatusTransactionResponse(
             null,
-            ['transactionId' => '{{GatewayName}}_consulta_pix_' . Str::uuid()->toString()]
+            ['{{GatewayName}}' => Str::uuid()->toString()],
         );
     }
 
-    public function boleto(array $data): TransactionResponse
+    public function boleto(string $access_token, array $data): TransactionResponse
     {
         return new TransactionResponse(
             null,
-            ['transactionId' => '{{GatewayName}}_boleto_' . Str::uuid()->toString()]
+            ['{{GatewayName}}' => Str::uuid()->toString()],
+            'TRANSACAO_SCAFOLDING_23H4HVHBHBRH34',
+            'CONCLUIDA'
         );
     }
 
-    public function consulta_boleto(Transaction $transaction): TransactionResponse
+    public function consulta_boleto(string $access_token, Transaction $transaction): CheckStatusTransactionResponse
     {
-        return new TransactionResponse(
+        return new CheckStatusTransactionResponse(
             null,
-            ['transactionId' => '{{GatewayName}}_consulta_boleto_' . Str::uuid()->toString()]
+            ['{{GatewayName}}' => Str::uuid()->toString()]
         );
     }
 
-    public function checkout_credito(array $data): TransactionResponse
+    public function checkout_credito(string $access_token, array $data): TransactionResponse
     {
         return new TransactionResponse(
             null,
-            ['transactionId' => '{{GatewayName}}_checkout_credito_' . Str::uuid()->toString()]
+            ['{{GatewayName}}' => Str::uuid()->toString()],
+            'TRANSACAO_SCAFOLDING_23H4HVHBHBRH34',
+            'CONCLUIDA'
         );
     }
 
-    public function checkout_debito(array $data): TransactionResponse
+    public function checkout_debito(string $access_token, array $data): TransactionResponse
     {
         return new TransactionResponse(
             null,
-            ['transactionId' => '{{GatewayName}}_checkout_debito_' . Str::uuid()->toString()]
+            ['{{GatewayName}}' => Str::uuid()->toString()],
+            'TRANSACAO_SCAFOLDING_23H4HVHBHBRH34',
+            'CONCLUIDA'
         );
     }
 }

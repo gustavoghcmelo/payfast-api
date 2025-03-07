@@ -5,6 +5,7 @@ namespace App\Exceptions;
 use App\Helpers\ApiResponse;
 use Exception;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 
@@ -19,7 +20,7 @@ class UserGatewayPermissionException extends Exception
         protected string $gateway
     )
     {
-        $this->message = "Usuário $this->user não tem permissão para utilizar o gateway $this->gateway";
+        $this->message = "A conta $this->user não tem permissão para utilizar o gateway $this->gateway";
         parent::__construct($this->message, $this->code);
     }
 
