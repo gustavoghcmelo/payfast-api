@@ -9,7 +9,7 @@ use App\Dto\Core\TransactionResponse;
 use App\Dto\Core\GatewayAuthResponse;
 use App\Dto\Core\CheckStatusTransactionResponse;
 
-class PaypalGateway implements GatewayInterface
+class {{GatewayName}}Gateway implements GatewayInterface
 {
     public function authenticate(): GatewayAuthResponse
     {

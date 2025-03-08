@@ -46,7 +46,7 @@ return [
     |
     */
 
-    'expiration' => 5, // TOKEN EXPIRA EM 5 MINUTOS
+    'expiration' => config('app.env') === 'production' ? 5 : 60,
 
     /*
     |--------------------------------------------------------------------------

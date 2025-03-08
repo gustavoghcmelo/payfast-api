@@ -16,8 +16,8 @@ class ApiResponse
      */
     public static function success(
         array|null $data = null,
-        int $statusCode = 200,
         null|string $message = 'Requisição finalizada com sucesso.',
+        int $statusCode = 200,
     ): JsonResponse
     {
         return response()->json([
