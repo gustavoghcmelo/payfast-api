@@ -2,24 +2,25 @@
 
 namespace App\Exceptions;
 
-use Exception;
 use App\Helpers\ApiResponse;
+use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 
-class InvalidTransactionTypeException extends Exception
+class GatewayTransactionTypePermissionException extends Exception
 {
-    protected $code = Response::HTTP_BAD_REQUEST;
+    protected $code = Response::HTTP_FORBIDDEN;
 
     protected $message = "";
 
     public function __construct(
         protected string $transaction_type,
         protected string $gateway
-    ) {
-        $this->message = "O tipo de transação: $transaction_type não é suportado pelo $this->gateway";
+    )
+    {
+        $this->message = "A transação $this->transaction_type não está disponível para o gateway $gateway";
         parent::__construct($this->message, $this->code);
     }
 

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Exceptions\GatewayNotFoundException;
+use App\Exceptions\GatewayTransactionTypePermissionException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -87,5 +88,25 @@ class Gateway extends Model
             'gateway_id',
             'transaction_type_id'
         );
+    }
+
+    /**
+     * @param Gateway $gateway
+     * @param TransactionType $transaction_type
+     * @return void
+     * @throws GatewayTransactionTypePermissionException
+     */
+    public static function canUseTransactionType(Gateway $gateway, TransactionType $transaction_type): void
+    {
+        $canUse = GatewayTransactionType::where('gateway_id', $gateway->id)
+            ->where('transaction_type_id', $transaction_type->id)
+            ->exists();
+
+        if(!$canUse) {
+            throw new GatewayTransactionTypePermissionException(
+                $transaction_type->description,
+                $gateway->slug
+            );
+        }
     }
 }

@@ -49,7 +49,7 @@ class GatewayServiceProvider extends ServiceProvider
                     $transactionRequest = Str::afterLast($request->path(), '/');
                     $active_transaction_type = TransactionType::where('description', $transactionRequest)->first();
                     if (!$active_transaction_type) {
-                        throw new InvalidTransactionTypeException($transactionRequest);
+                        throw new InvalidTransactionTypeException($transactionRequest, app('active_gateway')->slug);
                     }
                     return $active_transaction_type;
                 });

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Exceptions\UserGatewayPermissionException;
 use App\Exceptions\UserNotFoundException;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -13,6 +14,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\HasApiTokens;
 
@@ -113,5 +115,20 @@ class User extends Authenticatable implements MustVerifyEmail
         }
 
         return User::withTrashed()->find($user_id);
+    }
+
+    /**
+     * @param Gateway $gateway
+     * @return void
+     * @throws UserGatewayPermissionException
+     */
+    public static function canUseGateway(Gateway $gateway): void
+    {
+        $user = Auth::user();
+        $active_gateway = $gateway->slug;
+
+        if(!$user->tokenCan($active_gateway)) {
+            throw new UserGatewayPermissionException($user->email, $active_gateway);
+        }
     }
 }

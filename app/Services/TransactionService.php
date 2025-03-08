@@ -5,17 +5,25 @@ namespace App\Services;
 use App\Contracts\GatewayInterface;
 use App\Exceptions\CheckStatusTransactionException;
 use App\Exceptions\GatewayAuthFailureException;
+use App\Exceptions\GatewayTransactionTypePermissionException;
 use App\Exceptions\TransactionFailureException;
 use App\Exceptions\UserGatewayPermissionException;
+use App\Models\Gateway;
 use App\Models\Transaction;
-use Illuminate\Support\Facades\Auth;
+use App\Models\TransactionType;
+use App\Models\User;
+use Illuminate\Support\Str;
 
 class TransactionService
 {
-    protected GatewayInterface $gateway;
+    public Gateway $active_gateway;
+    public TransactionType $active_transaction_type;
 
-    public function __construct(GatewayInterface $gateway) {
-        $this->gateway = $gateway;
+    public function __construct(
+        public GatewayInterface $gateway
+    ) {
+        $this->active_gateway = app('active_gateway');
+        $this->active_transaction_type = app('active_transaction_type');
     }
 
     /**
@@ -24,47 +32,30 @@ class TransactionService
      * @throws GatewayAuthFailureException
      * @throws TransactionFailureException
      * @throws UserGatewayPermissionException
+     * @throws GatewayTransactionTypePermissionException
      */
-    public function pix_imediato(array $data): array
+    public function execute_transaction(array $data): array
     {
-        $this->userCanUseThisGateway();
+        User::canUseGateway($this->active_gateway);
+        Gateway::canUseTransactionType($this->active_gateway, $this->active_transaction_type);
 
         $transaction = Transaction::create($data);
 
         [ $auth_error, $access_token ] = $this->gateway->authenticate()->toArray();
         if ($auth_error) throw new GatewayAuthFailureException($transaction->id, $auth_error);
 
-        [ $transaction_error, $transaction_data, $gateway_transaction_id, $gateway_transaction_status ] = $this->gateway->pix_imediato($access_token, $data)->toArray();
+        [
+            $transaction_error,
+            $transaction_data,
+            $gateway_transaction_id,
+            $gateway_transaction_status
+
+        ] = $this->gatewayTransaction($access_token, $data);
         if ($transaction_error) throw new TransactionFailureException($transaction->id, $transaction_error);
 
         Transaction::update_transaction_success($transaction->id, $transaction_data, $gateway_transaction_id, $gateway_transaction_status);
         return $transaction_data;
     }
-
-
-    /**
-     * @param array $data
-     * @return array
-     * @throws GatewayAuthFailureException
-     * @throws TransactionFailureException
-     * @throws UserGatewayPermissionException
-     */
-    public function pix_vencimento(array $data): array
-    {
-        $this->userCanUseThisGateway();
-
-        $transaction = Transaction::create($data);
-
-        [ $auth_error, $access_token ] = $this->gateway->authenticate()->toArray();
-        if ($auth_error) throw new GatewayAuthFailureException($transaction->id, $auth_error);
-
-        [ $transaction_error, $transaction_data, $gateway_transaction_id, $gateway_transaction_status ] = $this->gateway->pix_vencimento($access_token, $data)->toArray();
-        if ($transaction_error) throw new TransactionFailureException($transaction->id, $transaction_error);
-
-        Transaction::update_transaction_success($transaction->id, $transaction_data, $gateway_transaction_id, $gateway_transaction_status);
-        return $transaction_data;
-    }
-
 
     /**
      * @param Transaction $transaction
@@ -72,124 +63,26 @@ class TransactionService
      * @throws GatewayAuthFailureException
      * @throws CheckStatusTransactionException
      * @throws UserGatewayPermissionException
+     * @throws GatewayTransactionTypePermissionException
      */
-    public function consulta_pix(Transaction $transaction): array
+    public function check_transaction(Transaction $transaction): array
     {
-        $this->userCanUseThisGateway();
+        User::canUseGateway($this->active_gateway);
+        Gateway::canUseTransactionType($this->active_gateway, $this->active_transaction_type);
 
         [ $auth_error, $access_token ] = ($this->gateway->authenticate())->toArray();
         if ($auth_error) throw new GatewayAuthFailureException($transaction->id, $auth_error);
 
-        [ $transaction_error, $transaction_data ] = $this->gateway->consulta_pix($access_token, $transaction)->toArray();
+        [ $transaction_error, $transaction_data ] = $this->gatewayTransaction($access_token, $transaction);
         if ($transaction_error) throw new CheckStatusTransactionException($transaction->id, $transaction_error);
 
         return $transaction_data;
     }
 
-
-    /**
-     * @param array $data
-     * @return array
-     * @throws GatewayAuthFailureException
-     * @throws TransactionFailureException
-     * @throws UserGatewayPermissionException
-     */
-    public function boleto(array $data): array
+    protected function gatewayTransaction($access_token, $data): array
     {
-        $this->userCanUseThisGateway();
-
-        $transaction = Transaction::create($data);
-
-        [ $auth_error, $access_token ] = $this->gateway->authenticate()->toArray();
-        if ($auth_error) throw new GatewayAuthFailureException($transaction->id, $auth_error);
-
-        [ $transaction_error, $transaction_data, $gateway_transaction_id, $gateway_transaction_status ] = $this->gateway->boleto($access_token, $data)->toArray();
-        if ($transaction_error) throw new TransactionFailureException($transaction->id, $transaction_error);
-
-        Transaction::update_transaction_success($transaction->id, $transaction_data, $gateway_transaction_id, $gateway_transaction_status);
-        return $transaction_data;
+        $methodName = Str::replace('-', '_', app('active_transaction_type')->description);
+        return $this->gateway->$methodName($access_token, $data)->toArray();
     }
 
-
-    /**
-     * @param Transaction $transaction
-     * @return array
-     * @throws GatewayAuthFailureException
-     * @throws CheckStatusTransactionException
-     * @throws UserGatewayPermissionException
-     */
-    public function consulta_boleto(Transaction $transaction): array
-    {
-        $this->userCanUseThisGateway();
-
-        [ $auth_error, $access_token ] = $this->gateway->authenticate()->toArray();
-        if ($auth_error) throw new GatewayAuthFailureException($transaction->id, $auth_error);
-
-        [ $transaction_error, $transaction_data ] = $this->gateway->consulta_boleto($access_token, $transaction)->toArray();
-        if ($transaction_error) throw new CheckStatusTransactionException($transaction->id, $transaction_error);
-
-        return $transaction_data;
-    }
-
-
-    /**
-     * @param array $data
-     * @return array
-     * @throws GatewayAuthFailureException
-     * @throws TransactionFailureException
-     * @throws UserGatewayPermissionException
-     */
-    public function checkout_credito(array $data): array
-    {
-        $this->userCanUseThisGateway();
-
-        $transaction = Transaction::create($data);
-
-        [ $auth_error, $access_token ] = $this->gateway->authenticate()->toArray();
-        if ($auth_error) throw new GatewayAuthFailureException($transaction->id, $auth_error);
-
-        [ $transaction_error, $transaction_data, $gateway_transaction_id, $gateway_transaction_status ] = $this->gateway->checkout_credito($access_token, $data)->toArray();
-        if ($transaction_error) throw new TransactionFailureException($transaction->id, $transaction_error);
-
-        Transaction::update_transaction_success($transaction->id, $transaction_data, $gateway_transaction_id, $gateway_transaction_status);
-        return $transaction_data;
-    }
-
-
-    /**
-     * @param array $data
-     * @return array
-     * @throws GatewayAuthFailureException
-     * @throws TransactionFailureException
-     * @throws UserGatewayPermissionException
-     */
-    public function checkout_debito(array $data): array
-    {
-        $this->userCanUseThisGateway();
-
-        $transaction = Transaction::create($data);
-
-        [ $auth_error, $access_token ] = $this->gateway->authenticate()->toArray();
-        if ($auth_error) throw new GatewayAuthFailureException($transaction->id, $auth_error);
-
-        [ $transaction_error, $transaction_data, $gateway_transaction_id, $gateway_transaction_status ] = $this->gateway->checkout_debito($access_token, $data)->toArray();
-        if ($transaction_error) throw new TransactionFailureException($transaction->id, $transaction_error);
-
-        Transaction::update_transaction_success($transaction->id, $transaction_data, $gateway_transaction_id, $gateway_transaction_status);
-        return $transaction_data;
-    }
-
-    /**
-     * @return void
-     * @throws UserGatewayPermissionException
-     */
-    protected function userCanUseThisGateway(): void
-    {
-        $user = Auth::user();
-        $active_gateway = app('active_gateway')->slug;
-
-        if(!$user->tokenCan($active_gateway)) {
-            throw new UserGatewayPermissionException($user->email, $active_gateway);
-        }
-    }
 }
