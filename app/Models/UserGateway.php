@@ -38,7 +38,7 @@ class UserGateway extends Model
 
         if ($gateway) throw new DuplicatedRelacUserGatewayException($data['gateway_id']);
 
-        UserGateway::create(['user_id' => $data['user_id'], 'gateway_id' => $data['gateway_id']]);
+        UserGateway::create($data);
     }
 
     public static function remove_relac_user_gateway($data): void

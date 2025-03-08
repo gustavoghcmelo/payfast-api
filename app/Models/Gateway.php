@@ -3,17 +3,19 @@
 namespace App\Models;
 
 use App\Exceptions\GatewayNotFoundException;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Query\Builder;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Support\Facades\DB;
 
 class Gateway extends Model
 {
     use HasFactory, SoftDeletes;
+
+    protected $hidden = ['pivot'];
 
     protected $table = 'gateways';
     protected $fillable = [
@@ -23,13 +25,16 @@ class Gateway extends Model
 
     public static function index(array $queryParams): CursorPaginator
     {
-        return DB::table('gateways')
+        return Gateway::query()
             ->when($queryParams['slug'], function (Builder $query, string $slug) {
                 return $query->where('slug', 'like', '%' . $slug . '%');
             })
             ->when($queryParams['description'], function (Builder $query, string $description) {
                 return $query->where('description', 'like', '%' . $description . '%');
             })
+            ->with(['transaction_types' => function ($query) {
+                $query->select('transaction_type.id', 'transaction_type.description');
+            }])
             ->orderBy('created_at', 'desc')
             ->cursorPaginate($queryParams['limit']);
     }
@@ -66,6 +71,21 @@ class Gateway extends Model
 
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'user_gateway', 'gateway_id', 'user_id');
+        return $this->belongsToMany(
+            User::class,
+            'user_gateway',
+            'gateway_id',
+            'user_id'
+        );
+    }
+
+    public function transaction_types(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            TransactionType::class,
+            'gateway_transaction_type',
+            'gateway_id',
+            'transaction_type_id'
+        );
     }
 }

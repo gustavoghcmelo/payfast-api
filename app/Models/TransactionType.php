@@ -5,6 +5,8 @@ namespace App\Models;
 use App\Exceptions\TransactionTypeNotFoundException;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Pagination\CursorPaginator;
@@ -15,6 +17,9 @@ class TransactionType extends Model
     use HasFactory, SoftDeletes;
 
     protected $table = 'transaction_type';
+
+    protected $hidden = ['pivot'];
+
     protected $fillable = [
         'description',
     ];
@@ -57,5 +62,10 @@ class TransactionType extends Model
         }
 
         return TransactionType::withTrashed()->find($transaction_type_id);
+    }
+
+    public function gateways(): BelongsToMany
+    {
+        return $this->belongsToMany(Gateway::class, 'gateway_transaction_type', 'transaction_type_id', 'gateway_id');
     }
 }

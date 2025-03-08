@@ -5,11 +5,10 @@ namespace App\Models;
 use App\Exceptions\UserNotFoundException;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Pagination\CursorPaginator;
@@ -62,15 +61,28 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public static function index(array $queryParams): CursorPaginator
     {
-        return DB::table('users')
+        return User::query()
             ->when($queryParams['name'], function (Builder $query, string $name) {
                 return $query->where('name', 'like', '%' . $name . '%');
             })
             ->when($queryParams['email'], function (Builder $query, string $email) {
                 return $query->where('description', 'like', '%' . $email . '%');
             })
+            ->with(['gateways' => function ($query) {
+                $query->select('gateways.id', 'gateways.slug', 'gateways.description');
+            }])
             ->orderBy('created_at', 'desc')
             ->cursorPaginate($queryParams['limit']);
+
+//        return DB::table('users')
+//            ->when($queryParams['name'], function (Builder $query, string $name) {
+//                return $query->where('name', 'like', '%' . $name . '%');
+//            })
+//            ->when($queryParams['email'], function (Builder $query, string $email) {
+//                return $query->where('description', 'like', '%' . $email . '%');
+//            })
+//            ->orderBy('created_at', 'desc')
+//            ->cursorPaginate($queryParams['limit']);
     }
 
     /**
