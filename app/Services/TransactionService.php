@@ -16,14 +16,14 @@ use Illuminate\Support\Str;
 
 class TransactionService
 {
-    public Gateway $active_gateway;
-    public TransactionType $active_transaction_type;
+    public Gateway $requested_gateway;
+    public TransactionType $requested_transaction_type;
 
     public function __construct(
         public GatewayInterface $gateway
     ) {
-        $this->active_gateway = app('active_gateway');
-        $this->active_transaction_type = app('active_transaction_type');
+        $this->requested_gateway = app('active_gateway');
+        $this->requested_transaction_type = app('active_transaction_type');
     }
 
     /**
@@ -36,8 +36,8 @@ class TransactionService
      */
     public function execute_transaction(array $data): array
     {
-        User::canUseGateway($this->active_gateway);
-        Gateway::canUseTransactionType($this->active_gateway, $this->active_transaction_type);
+        User::canUseGateway($this->requested_gateway);
+        Gateway::canUseTransactionType($this->requested_gateway, $this->requested_transaction_type);
 
         $transaction = Transaction::create($data);
 
@@ -67,8 +67,8 @@ class TransactionService
      */
     public function check_transaction(Transaction $transaction): array
     {
-        User::canUseGateway($this->active_gateway);
-        Gateway::canUseTransactionType($this->active_gateway, $this->active_transaction_type);
+        User::canUseGateway($this->requested_gateway);
+        Gateway::canUseTransactionType($this->requested_gateway, $this->requested_transaction_type);
 
         [ $auth_error, $access_token ] = ($this->gateway->authenticate())->toArray();
         if ($auth_error) throw new GatewayAuthFailureException($transaction->id, $auth_error);
@@ -81,7 +81,7 @@ class TransactionService
 
     protected function gatewayTransaction($access_token, $data): array
     {
-        $methodName = Str::replace('-', '_', app('active_transaction_type')->description);
+        $methodName = Str::replace('-', '_', $this->requested_transaction_type->description);
         return $this->gateway->$methodName($access_token, $data)->toArray();
     }
 
