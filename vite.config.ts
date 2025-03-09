@@ -1,9 +1,9 @@
 import vue from '@vitejs/plugin-vue';
-import autoprefixer from 'autoprefixer';
 import laravel from 'laravel-vite-plugin';
+import { fileURLToPath } from 'node:url'
 import path from 'path';
-import tailwindcss from 'tailwindcss';
 import { defineConfig } from 'vite';
+import { quasar, transformAssetUrls } from '@quasar/vite-plugin'
 
 export default defineConfig({
     plugins: [
@@ -12,22 +12,17 @@ export default defineConfig({
             refresh: true,
         }),
         vue({
-            template: {
-                transformAssetUrls: {
-                    base: null,
-                    includeAbsolute: false,
-                },
-            },
+            template: { transformAssetUrls }
         }),
+        quasar({
+            sassVariables: fileURLToPath(
+                new URL('resources/css/quasar-variables.sass', import.meta.url)
+            )
+        })
     ],
     resolve: {
         alias: {
             '@': path.resolve(__dirname, './resources/js'),
         },
-    },
-    css: {
-        postcss: {
-            plugins: [tailwindcss, autoprefixer],
-        },
-    },
+    }
 });

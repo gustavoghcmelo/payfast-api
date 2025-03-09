@@ -2,6 +2,8 @@
 
 namespace App\Dto\Core;
 
+use App\Exceptions\InvalidArgumentsTransactionResponseException;
+
 class TransactionResponse
 {
     public function __construct(
@@ -9,7 +11,11 @@ class TransactionResponse
         protected array|null $data,
         protected string|null $gateway_transaction_id,
         protected string|null $gateway_transaction_status,
-    ) {}
+    ) {
+        if ($error === null && $data === null) {
+            throw new InvalidArgumentsTransactionResponseException();
+        }
+    }
 
     public function toArray(): array
     {

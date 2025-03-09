@@ -3,9 +3,11 @@
 namespace App\Services;
 
 use App\Contracts\GatewayInterface;
+use App\Dto\Core\TransactionResponse;
 use App\Exceptions\CheckStatusTransactionException;
 use App\Exceptions\GatewayAuthFailureException;
 use App\Exceptions\GatewayTransactionTypePermissionException;
+use App\Exceptions\InvalidTransactionTypeException;
 use App\Exceptions\TransactionFailureException;
 use App\Exceptions\UserGatewayPermissionException;
 use App\Models\Gateway;
@@ -33,6 +35,7 @@ class TransactionService
      * @throws TransactionFailureException
      * @throws UserGatewayPermissionException
      * @throws GatewayTransactionTypePermissionException
+     * @throws InvalidTransactionTypeException
      */
     public function execute_transaction(array $data): array
     {
@@ -64,6 +67,7 @@ class TransactionService
      * @throws CheckStatusTransactionException
      * @throws UserGatewayPermissionException
      * @throws GatewayTransactionTypePermissionException
+     * @throws InvalidTransactionTypeException
      */
     public function check_transaction(Transaction $transaction): array
     {
@@ -79,10 +83,22 @@ class TransactionService
         return $transaction_data;
     }
 
+    /**
+     * @param $access_token
+     * @param $data
+     * @return array
+     * @throws InvalidTransactionTypeException
+     */
     protected function gatewayTransaction($access_token, $data): array
     {
-        $methodName = Str::replace('-', '_', $this->requested_transaction_type->description);
-        return $this->gateway->$methodName($access_token, $data)->toArray();
+        $transaction_type = $this->requested_transaction_type->description;
+        $methodName = Str::replace('-', '_', $transaction_type);
+
+        if (!method_exists($this->gateway, $methodName)) {
+            throw new InvalidTransactionTypeException($transaction_type, $this->requested_gateway->slug);
+        }
+
+        return (call_user_func([$this->gateway, $methodName], $access_token, $data))->toArray();
     }
 
 }
