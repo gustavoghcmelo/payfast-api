@@ -101,10 +101,10 @@ class User extends Authenticatable implements MustVerifyEmail
     /**
      * @param array<mixed> $data
      * @param int $user_id
-     * @return Builder<User>
+     * @return User
      * @throws UserNotFoundException
      */
-    public static function edit(array $data, int $user_id): Builder
+    public static function edit(array $data, int $user_id): User
     {
         if (!User::where('id', $user_id)->exists()) {
             throw new UserNotFoundException($user_id);
@@ -114,7 +114,7 @@ class User extends Authenticatable implements MustVerifyEmail
             ->where('id', $user_id)
             ->update($data);
 
-        return User::find($user_id);
+        return User::where('id', $user_id)->first();
     }
 
     /**

@@ -9,7 +9,6 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Database\QueryException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Illuminate\Support\Facades\Log;
-use App\Http\Middleware\ValidateUserGatewayPermission;
 use Illuminate\Auth\AuthenticationException;
 use App\Helpers\ApiResponse;
 use Illuminate\Http\Request;

@@ -7,10 +7,10 @@ use App\Exceptions\UserNotFoundException;
 
 test('should throw a GatewayNotFoundException', function () {
     $this->expectException(GatewayNotFoundException::class);
-    $this->expectExceptionMessage("Gateway ID: bradesco não foi encontrado.");
+    $this->expectExceptionMessage("Gateway ID: 1 não foi encontrado.");
     $this->expectExceptionCode(404);
 
-    throw new GatewayNotFoundException('bradesco');
+    throw new GatewayNotFoundException(1);
 });
 
 test('should throw a InvalidGatewayException', function () {

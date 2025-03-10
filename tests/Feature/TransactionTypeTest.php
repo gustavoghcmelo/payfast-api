@@ -1,6 +1,12 @@
 <?php
 
 use App\Models\TransactionType;
+use App\Models\User;
+use Laravel\Sanctum\Sanctum;
+
+beforeEach(function () {
+    Sanctum::actingAs(User::factory()->create());
+});
 
 test('can list all transaction types from db', function () {
     TransactionType::factory()->count(3)->create();
@@ -34,6 +40,7 @@ test('when create a new transaction_type should return ApiResponse::success stru
 });
 
 test('on create should throw ValidationException if not description field exist', function () {
+    app()->setLocale('en');
     $response = $this->post('/api/v1/transaction-type', []);
 
     $response->assertJsonValidationErrors(['description' => 'The description field is required.']);
@@ -58,6 +65,8 @@ test('when update a transaction_type should return ApiResponse::success structur
 });
 
 test('on update should throw ValidationException if not description field exist', function () {
+    app()->setLocale('en');
+
     $transaction_type = TransactionType::factory()->create();
     $response = $this->put("/api/v1/transaction-type/$transaction_type->id", []);
 

@@ -49,10 +49,10 @@ class TransactionType extends Model
     /**
      * @param array<mixed> $data
      * @param int $transaction_type_id
-     * @return Builder<TransactionType>
+     * @return TransactionType
      * @throws TransactionTypeNotFoundException
      */
-    public static function edit(array $data, int $transaction_type_id): Builder
+    public static function edit(array $data, int $transaction_type_id): TransactionType
     {
         if (!TransactionType::where('id', $transaction_type_id)->exists()) {
             throw new TransactionTypeNotFoundException($transaction_type_id);
@@ -62,7 +62,7 @@ class TransactionType extends Model
             ->where('id', $transaction_type_id)
             ->update($data);
 
-        return TransactionType::find($transaction_type_id);
+        return TransactionType::where('id', $transaction_type_id)->first();
     }
 
     /**

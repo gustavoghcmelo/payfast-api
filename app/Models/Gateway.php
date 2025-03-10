@@ -56,10 +56,10 @@ class Gateway extends Model
     /**
      * @param array<mixed> $data
      * @param int $gateway_id
-     * @return Builder<Gateway>
+     * @return Gateway
      * @throws GatewayNotFoundException
      */
-    public static function edit(array $data, int $gateway_id): Builder
+    public static function edit(array $data, int $gateway_id): Gateway
     {
         if (!Gateway::where('id', $gateway_id)->exists()) {
             throw new GatewayNotFoundException($gateway_id);
@@ -69,7 +69,7 @@ class Gateway extends Model
             ->where('id', $gateway_id)
             ->update($data);
 
-        return Gateway::find($gateway_id);
+        return Gateway::where('id', $gateway_id)->first();
     }
 
     /**

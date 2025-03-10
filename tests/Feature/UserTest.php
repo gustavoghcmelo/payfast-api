@@ -1,7 +1,11 @@
 <?php
 
-use App\Helpers\ApiResponse;
 use App\Models\User;
+use Laravel\Sanctum\Sanctum;
+
+beforeEach(function () {
+    Sanctum::actingAs(User::factory()->create());
+});
 
 test('can list all users from db', function () {
     User::factory()->count(3)->create();
@@ -31,6 +35,8 @@ test('on update should return ApiResponse::success structure and status 200', fu
 });
 
 test('on update a user should throw ValidationException if name field not exist', function () {
+    app()->setLocale('en');
+
     $user = User::factory()->create();
     $response = $this->put("/api/v1/user/$user->id", []);
 

@@ -22,8 +22,7 @@ class ConfirmablePasswordRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'password' => 'required|string|confirmed|min:8',
-            'password_confirmation' => 'required|string'
+            'password' => 'required|string|min:8',
         ];
     }
 }

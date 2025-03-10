@@ -1,6 +1,12 @@
 <?php
 
 use App\Models\Gateway;
+use App\Models\User;
+use Laravel\Sanctum\Sanctum;
+
+beforeEach(function () {
+    Sanctum::actingAs(User::factory()->create());
+});
 
 test('can list all gateways from db', function () {
     Gateway::factory()->count(3)->create();
@@ -56,6 +62,8 @@ test('when create a new gateway should return ApiResponse::success structure', f
 });
 
 test('on create should throw ValidationException if not slug field exist', function () {
+    app()->setLocale('en');
+
     $response = $this->post('/api/v1/gateway', [
         'description' => 'novo gateway',
     ]);
@@ -72,6 +80,8 @@ test('on field slug ValidationError should return ApiResponse::error structure a
 });
 
 test('on create should throw ValidationException if not description field exist', function () {
+    app()->setLocale('en');
+
     $response = $this->post('/api/v1/gateway', [
         'slug' => 'bradesco',
     ]);

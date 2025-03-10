@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\NewPasswordRequest;
+use App\Http\Requests\CreatePasswordRequest;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
@@ -18,10 +20,10 @@ class NewPasswordController extends Controller
     /**
      * Show the password reset page.
      */
-    public function create(NewPasswordRequest $request): Response
+    public function create(Request $request): Response
     {
         return Inertia::render('auth/ResetPassword', [
-            'email' => $request->email,
+            'email' => $request->get('email'),
             'token' => $request->route('token'),
         ]);
     }
