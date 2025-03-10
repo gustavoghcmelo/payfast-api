@@ -12,6 +12,9 @@ use Illuminate\Support\Facades\Log;
 
 class GatewayAuthFailureException extends Exception
 {
+    /**
+     * @var int
+     */
     protected $code = Response::HTTP_UNAUTHORIZED;
 
     public function __construct(
@@ -26,9 +29,6 @@ class GatewayAuthFailureException extends Exception
     public function render(Request $request): JsonResponse
     {
         Log::channel('transaction')->error($this->error, $request->all());
-
-        if ($request->is('api/*')) {
-            return ApiResponse::error($this->error, [], $this->code);
-        }
+        return ApiResponse::error($this->error, [], $this->code);
     }
 }

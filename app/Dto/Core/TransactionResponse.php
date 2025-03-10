@@ -6,6 +6,13 @@ use App\Exceptions\InvalidArgumentsTransactionResponseException;
 
 class TransactionResponse
 {
+    /**
+     * @param string|null $error
+     * @param array<mixed>|null $data
+     * @param string|null $gateway_transaction_id
+     * @param string|null $gateway_transaction_status
+     * @throws InvalidArgumentsTransactionResponseException
+     */
     public function __construct(
         protected string|null $error,
         protected array|null $data,
@@ -17,6 +24,9 @@ class TransactionResponse
         }
     }
 
+    /**
+     * @return array<mixed>
+     */
     public function toArray(): array
     {
         return [

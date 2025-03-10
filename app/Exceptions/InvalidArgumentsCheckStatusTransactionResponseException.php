@@ -5,13 +5,20 @@ namespace App\Exceptions;
 use App\Helpers\ApiResponse;
 use Exception;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 
 class InvalidArgumentsCheckStatusTransactionResponseException extends Exception
 {
+    /**
+     * @var int
+     */
     protected $code = Response::HTTP_INTERNAL_SERVER_ERROR;
 
+    /**
+     * @var string
+     */
     protected $message = "";
 
     public function __construct() {
@@ -22,9 +29,6 @@ class InvalidArgumentsCheckStatusTransactionResponseException extends Exception
     public function render(Request $request): JsonResponse
     {
         Log::channel('transaction')->error($this->message, $request->all());
-
-        if ($request->is('api/*')) {
-            return ApiResponse::error($this->message, [], $this->code);
-        }
+        return ApiResponse::error($this->message, [], $this->code);
     }
 }

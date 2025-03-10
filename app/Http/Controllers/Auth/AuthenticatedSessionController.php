@@ -5,19 +5,20 @@ namespace App\Http\Controllers\Auth;
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
-use App\Models\UserGateway;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class AuthenticatedSessionController extends Controller
 {
     /**
-     * Show the login page.
+     * @param Request $request
+     * @return Response
      */
     public function create(Request $request): Response
     {
@@ -28,7 +29,9 @@ class AuthenticatedSessionController extends Controller
     }
 
     /**
-     * Handle an incoming authentication request.
+     * @param LoginRequest $request
+     * @return RedirectResponse
+     * @throws ValidationException
      */
     public function store(LoginRequest $request): RedirectResponse
     {
@@ -45,10 +48,13 @@ class AuthenticatedSessionController extends Controller
 
         $user = Auth::user();
 
+        /** @phpstan-ignore-next-line */
         $user->tokens()->delete();
 
+        /** @phpstan-ignore-next-line */
         $gateways = $user::gateway_array($user->id)->toArray();
 
+        /** @phpstan-ignore-next-line */
         $token = $user->createToken('access_token', $gateways)->plainTextToken;
 
         return ApiResponse::success([
@@ -58,10 +64,12 @@ class AuthenticatedSessionController extends Controller
     }
 
     /**
-     * Destroy an authenticated session.
+     * @param Request $request
+     * @return RedirectResponse
      */
     public function destroy(Request $request): RedirectResponse
     {
+        /** @phpstan-ignore-next-line */
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();

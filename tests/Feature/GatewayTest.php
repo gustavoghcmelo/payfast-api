@@ -1,6 +1,5 @@
 <?php
 
-use App\Exceptions\GatewayNotFoundException;
 use App\Models\Gateway;
 
 test('can list all gateways from db', function () {

@@ -2,14 +2,14 @@
 
 namespace App\Exceptions;
 
-use Exception;
 use App\Helpers\ApiResponse;
+use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 
-class GatewayNotFoundException extends Exception
+class TransactionNotFoundException extends Exception
 {
     /**
      * @var int
@@ -21,9 +21,9 @@ class GatewayNotFoundException extends Exception
      */
     protected $message = "";
 
-    public function __construct(protected int $gateway)
+    public function __construct(protected int $transaction_id)
     {
-        $this->message = "Gateway ID: $gateway não foi encontrado.";
+        $this->message = "A transação de identificador: $this->transaction_id não foi encontrada.";
         parent::__construct($this->message, $this->code);
     }
 

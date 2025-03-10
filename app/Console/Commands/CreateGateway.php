@@ -3,10 +3,11 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
-class CreateGateway extends Command
+class CreateGateway extends Command implements PromptsForMissingInput
 {
     /**
      * The name and signature of the console command.
@@ -23,9 +24,21 @@ class CreateGateway extends Command
     protected $description = 'Cria um novo gateway de pagamento no projeto.';
 
     /**
+     * Prompt for missing input arguments using the returned questions.
+     *
+     * @return array<string, string>
+     */
+    protected function promptForMissingArgumentsUsing(): array
+    {
+        return [
+            'name' => 'Informe o nome do gateway: ',
+        ];
+    }
+
+    /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): void
     {
         $name = $this->argument('name');
         $gatewayName = Str::studly($name);

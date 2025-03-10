@@ -9,6 +9,9 @@ class GatewayAuthResponse
         protected string|null $access_token,
     ) {}
 
+    /**
+     * @return array<mixed>
+     */
     public function toArray(): array
     {
         return [

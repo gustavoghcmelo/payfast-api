@@ -29,21 +29,21 @@ class GatewayController extends Controller
             'description' => $request->input('description'),
         ]);
 
-        return ApiResponse::success([$saved], Response::HTTP_CREATED);
+        return ApiResponse::success([$saved], '', Response::HTTP_CREATED);
     }
 
     public function update(UpdateRequest $request, int $gateway_id): JsonResponse
     {
         return ApiResponse::success([
             Gateway::edit($request->all(), $gateway_id)
-        ], Response::HTTP_OK);
+        ], '', Response::HTTP_OK);
     }
 
     public function destroy(int $gateway_id): JsonResponse
     {
         return ApiResponse::success([
             Gateway::remove($gateway_id)
-        ], Response::HTTP_OK);
+        ], '', Response::HTTP_OK);
     }
 
     public function add_transaction_type(int $gateway_id, AddTransactionTypeRequest $request): JsonResponse

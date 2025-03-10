@@ -9,11 +9,20 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Pagination\CursorPaginator;
+use Illuminate\Contracts\Pagination\CursorPaginator;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * @method static \Illuminate\Database\Eloquent\Builder<Gateway> create(array<mixed> $attributes = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<Gateway> where($column, $operator = null, $value = null)
+ * @method static \Illuminate\Database\Eloquent\Builder<Gateway> find($id, $columns = ['*'])
+ * @property int $id
+ * @property string $description
+ * @property string $slug
+ */
 class Gateway extends Model
 {
+    /** @phpstan-ignore-next-line */
     use HasFactory, SoftDeletes;
 
     protected $hidden = ['pivot'];
@@ -24,6 +33,10 @@ class Gateway extends Model
         'description',
     ];
 
+    /**
+     * @param array<string, string> $queryParams
+     * @return CursorPaginator<int, Gateway>
+     */
     public static function index(array $queryParams): CursorPaginator
     {
         return Gateway::query()
@@ -37,13 +50,16 @@ class Gateway extends Model
                 $query->select('transaction_type.id', 'transaction_type.description');
             }])
             ->orderBy('created_at', 'desc')
-            ->cursorPaginate($queryParams['limit']);
+            ->cursorPaginate((int) $queryParams['limit']);
     }
 
     /**
+     * @param array<mixed> $data
+     * @param int $gateway_id
+     * @return Builder<Gateway>
      * @throws GatewayNotFoundException
      */
-    public static function edit(array $data, int $gateway_id): Gateway
+    public static function edit(array $data, int $gateway_id): Builder
     {
         if (!Gateway::where('id', $gateway_id)->exists()) {
             throw new GatewayNotFoundException($gateway_id);
@@ -70,6 +86,9 @@ class Gateway extends Model
         return Gateway::withTrashed()->find($gateway_id);
     }
 
+    /**
+     * @return BelongsToMany<User, $this>
+     */
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(
@@ -80,6 +99,9 @@ class Gateway extends Model
         );
     }
 
+    /**
+     * @return BelongsToMany<TransactionType, $this>
+     */
     public function transaction_types(): BelongsToMany
     {
         return $this->belongsToMany(

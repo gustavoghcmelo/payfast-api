@@ -9,7 +9,7 @@ class ApiResponse
     /**
      * Retorna uma resposta de sucesso.
      *
-     * @param mixed $data
+     * @param array<mixed>|null $data
      * @param null|string $message
      * @param int $statusCode
      * @return JsonResponse
@@ -31,7 +31,7 @@ class ApiResponse
      * Retorna uma resposta de erro.
      *
      * @param string $message
-     * @param array $errors
+     * @param array<mixed> $errors
      * @param int $statusCode
      * @return JsonResponse
      */

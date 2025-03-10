@@ -9,8 +9,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @method static \Illuminate\Database\Eloquent\Builder<UserGateway> where($column, $operator = null, $value = null)
+ * @method static \Illuminate\Database\Eloquent\Builder<UserGateway> create(array<mixed> $attributes = [])
+ */
 class UserGateway extends Model
 {
+    /** @phpstan-ignore-next-line  */
     use HasFactory, SoftDeletes;
 
     protected $table = 'user_gateway';
@@ -20,13 +25,14 @@ class UserGateway extends Model
       'gateway_id',
     ];
 
+
     /**
-     * @param $user_id
-     * @param $gateway_id
+     * @param array{user_id: int, gateway_id: string} $data
      * @return void
      * @throws DuplicatedRelacUserGatewayException
+     * @throws UserNotFoundException
      */
-    public static function create_relac_user_gateway($data): void
+    public static function create_relac_user_gateway(array $data): void
     {
         if (!User::where('id', $data['user_id'])->exists()) {
             throw new UserNotFoundException($data['user_id']);
@@ -36,18 +42,23 @@ class UserGateway extends Model
             ->where('gateway_id', $data['gateway_id'])
             ->first();
 
-        if ($gateway) throw new DuplicatedRelacUserGatewayException($data['gateway_id']);
+        if ($gateway) throw new DuplicatedRelacUserGatewayException((int) $data['gateway_id']);
 
         UserGateway::create($data);
     }
 
-    public static function remove_relac_user_gateway($data): void
+    /**
+     * @param array{user_id: int, gateway_id: string} $data
+     * @return void
+     * @throws RelacUserGatewayNotFoundException
+     */
+    public static function remove_relac_user_gateway(array $data): void
     {
         $gateway = UserGateway::where('user_id', $data['user_id'])
             ->where('gateway_id', $data['gateway_id'])
             ->first();
 
-        if (!$gateway) throw new RelacUserGatewayNotFoundException($data['gateway_id']);
+        if (!$gateway) throw new RelacUserGatewayNotFoundException((int) $data['gateway_id']);
 
         $gateway->forceDelete();
     }

@@ -23,7 +23,7 @@ class BradescoGateway implements GatewayInterface
 
     /**
      * @param string $access_token
-     * @param array $data
+     * @param array<mixed> $data
      * @return TransactionResponse
      * @throws InvalidArgumentsTransactionResponseException
      */
@@ -39,7 +39,7 @@ class BradescoGateway implements GatewayInterface
 
     /**
      * @param string $access_token
-     * @param array $data
+     * @param array<mixed> $data
      * @return TransactionResponse
      * @throws InvalidArgumentsTransactionResponseException
      */
@@ -69,7 +69,7 @@ class BradescoGateway implements GatewayInterface
 
     /**
      * @param string $access_token
-     * @param array $data
+     * @param array<mixed> $data
      * @return TransactionResponse
      * @throws InvalidArgumentsTransactionResponseException
      */
@@ -99,7 +99,7 @@ class BradescoGateway implements GatewayInterface
 
     /**
      * @param string $access_token
-     * @param array $data
+     * @param array<mixed> $data
      * @return TransactionResponse
      * @throws InvalidArgumentsTransactionResponseException
      */
@@ -115,7 +115,7 @@ class BradescoGateway implements GatewayInterface
 
     /**
      * @param string $access_token
-     * @param array $data
+     * @param array<mixed> $data
      * @return TransactionResponse
      * @throws InvalidArgumentsTransactionResponseException
      */

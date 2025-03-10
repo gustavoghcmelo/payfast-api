@@ -11,8 +11,14 @@ use Illuminate\Support\Facades\Log;
 
 class InvalidTransactionTypeException extends Exception
 {
+    /**
+     * @var int
+     */
     protected $code = Response::HTTP_BAD_REQUEST;
 
+    /**
+     * @var string
+     */
     protected $message = "";
 
     public function __construct(
@@ -26,9 +32,6 @@ class InvalidTransactionTypeException extends Exception
     public function render(Request $request): JsonResponse
     {
         Log::channel('transaction')->error($this->message, $request->all());
-
-        if ($request->is('api/*')) {
-            return ApiResponse::error($this->message, [], $this->code);
-        }
+        return ApiResponse::error($this->message, [], $this->code);
     }
 }

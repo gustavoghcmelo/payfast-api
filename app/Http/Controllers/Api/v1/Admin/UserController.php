@@ -27,14 +27,14 @@ class UserController extends Controller
     {
         return ApiResponse::success([
             User::edit($request->all(), $gateway_id)
-        ], Response::HTTP_OK);
+        ], '', Response::HTTP_OK);
     }
 
     public function destroy(int $gateway_id): JsonResponse
     {
         return ApiResponse::success([
             User::remove($gateway_id)
-        ], Response::HTTP_OK);
+        ], '', Response::HTTP_OK);
     }
 
     public function add_gateway(int $user_id, AddGatewayRequest $request): JsonResponse

@@ -18,8 +18,14 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\HasApiTokens;
 
+/**
+ * @method static \Illuminate\Database\Eloquent\Builder<User> find($column)
+ * @method static \Illuminate\Database\Eloquent\Builder<User> where($column, $operator = null, $value = null)
+ * @method static \Illuminate\Database\Eloquent\Builder<User> create(array<mixed> $attributes = [])
+ */
 class User extends Authenticatable implements MustVerifyEmail
 {
+    /** @phpstan-ignore-next-line  */
     use HasFactory, Notifiable, HasApiTokens, SoftDeletes;
 
     protected $table = 'users';
@@ -43,24 +49,39 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
+    /**
+     * @return HasMany<Transaction, $this>
+     */
     public function transactions(): HasMany
     {
         return $this->hasMany(Transaction::class);
     }
 
+    /**
+     * @return BelongsToMany<Gateway, $this>
+     */
     public function gateways(): BelongsToMany
     {
         return $this->belongsToMany(Gateway::class, 'user_gateway', 'user_id', 'gateway_id');
     }
 
-    public static function gateway_array($user_id): Collection
+    /**
+     * @param int $user_id
+     * @return Collection<int, User>
+     */
+    public static function gateway_array(int $user_id): Collection
     {
         $user = User::with('gateways')->find($user_id);
+        /** @phpstan-ignore-next-line  */
         return $user->gateways->pipe(function ($gateway) {
             return $gateway->pluck('slug');
         });
     }
 
+    /**
+     * @param array{name: string, email: string, limit: string} $queryParams
+     * @return CursorPaginator<int, User>
+     */
     public static function index(array $queryParams): CursorPaginator
     {
         return User::query()
@@ -68,29 +89,22 @@ class User extends Authenticatable implements MustVerifyEmail
                 return $query->where('name', 'like', '%' . $name . '%');
             })
             ->when($queryParams['email'], function (Builder $query, string $email) {
-                return $query->where('description', 'like', '%' . $email . '%');
+                return $query->where('email', 'like', '%' . $email . '%');
             })
             ->with(['gateways' => function ($query) {
                 $query->select('gateways.id', 'gateways.slug', 'gateways.description');
             }])
             ->orderBy('created_at', 'desc')
-            ->cursorPaginate($queryParams['limit']);
-
-//        return DB::table('users')
-//            ->when($queryParams['name'], function (Builder $query, string $name) {
-//                return $query->where('name', 'like', '%' . $name . '%');
-//            })
-//            ->when($queryParams['email'], function (Builder $query, string $email) {
-//                return $query->where('description', 'like', '%' . $email . '%');
-//            })
-//            ->orderBy('created_at', 'desc')
-//            ->cursorPaginate($queryParams['limit']);
+            ->cursorPaginate((int) $queryParams['limit']);
     }
 
     /**
+     * @param array<mixed> $data
+     * @param int $user_id
+     * @return Builder<User>
      * @throws UserNotFoundException
      */
-    public static function edit(array $data, int $user_id): User
+    public static function edit(array $data, int $user_id): Builder
     {
         if (!User::where('id', $user_id)->exists()) {
             throw new UserNotFoundException($user_id);
@@ -104,6 +118,8 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * @param int $user_id
+     * @return User
      * @throws UserNotFoundException
      */
     public static function remove(int $user_id): User
@@ -127,7 +143,9 @@ class User extends Authenticatable implements MustVerifyEmail
         $user = Auth::user();
         $active_gateway = $gateway->slug;
 
+        /** @phpstan-ignore-next-line  */
         if(!$user->tokenCan($active_gateway)) {
+            /** @phpstan-ignore-next-line  */
             throw new UserGatewayPermissionException($user->email, $active_gateway);
         }
     }

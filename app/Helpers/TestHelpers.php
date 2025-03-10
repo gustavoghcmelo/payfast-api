@@ -1,6 +1,15 @@
 <?php
 
-function assertApiResponseSuccess($response, $status = 200, array $dataStructure = [])
+use Illuminate\Testing\TestResponse;
+use Illuminate\Http\JsonResponse;
+
+/**
+ * @param TestResponse<JsonResponse> $response
+ * @param int $status
+ * @param array<mixed> $dataStructure
+ * @return void
+ */
+function assertApiResponseSuccess(TestResponse $response, int $status = 200, array $dataStructure = []): void
 {
     $response->assertStatus($status)
         ->assertJsonStructure([
@@ -10,7 +19,13 @@ function assertApiResponseSuccess($response, $status = 200, array $dataStructure
         ]);
 }
 
-function assertApiResponseError($response, int $code = 400, array $errorsStructure = [])
+/**
+ * @param TestResponse<JsonResponse> $response
+ * @param int $code
+ * @param array<mixed> $errorsStructure
+ * @return void
+ */
+function assertApiResponseError(TestResponse $response, int $code = 400, array $errorsStructure = []): void
 {
     $response->assertStatus($code)
         ->assertJsonStructure([
@@ -25,7 +40,7 @@ function assertApiResponseError($response, int $code = 400, array $errorsStructu
         ]);
 }
 
-function removeLineByPassKey($arquivo, $palavra): void {
+function removeLineByPassKey(string $arquivo, string $palavra): void {
     $lines = file($arquivo, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     $file = fopen($arquivo, 'w');
 

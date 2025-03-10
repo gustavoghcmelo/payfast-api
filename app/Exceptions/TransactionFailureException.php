@@ -12,7 +12,16 @@ use Illuminate\Support\Facades\Log;
 
 class TransactionFailureException extends Exception
 {
+    /**
+     * @var int
+     */
     protected $code = Response::HTTP_UNPROCESSABLE_ENTITY;
+
+    /**
+     * @param string $transaction_id
+     * @param string $error
+     * @param array<mixed>|object|null $payload
+     */
     public function __construct(
         protected string $transaction_id,
         protected string $error,
@@ -25,9 +34,6 @@ class TransactionFailureException extends Exception
     public function render(Request $request): JsonResponse
     {
         Log::channel('transaction')->error($this->error, $request->all());
-
-        if ($request->is('api/*')) {
-            return ApiResponse::error($this->error, [], $this->code);
-        }
+        return ApiResponse::error($this->error, [], $this->code);
     }
 }
