@@ -19,6 +19,7 @@ class Transaction extends Model
         'transaction_type_id',
         'gateway_id',
         'gateway_transaction_id',
+        'gateway_transaction_error',
         'payload',
         'amount',
         'currency',

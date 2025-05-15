@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Contracts\GatewayInterface;
+use App\Dto\Transaction\CreateTransactionDto;
 use App\Exceptions\CheckStatusTransactionException;
 use App\Exceptions\GatewayAuthFailureException;
 use App\Exceptions\GatewayTransactionTypePermissionException;
@@ -10,6 +11,8 @@ use App\Exceptions\InvalidTransactionTypeException;
 use App\Exceptions\TransactionFailureException;
 use App\Exceptions\TransactionNotFoundException;
 use App\Exceptions\UserGatewayPermissionException;
+use App\Http\Requests\Api\v1\Transaction\CreateTransactionRequest;
+use Spatie\DataTransferObject\Exceptions\UnknownProperties;
 use App\Models\Gateway;
 use App\Models\Transaction;
 use App\Models\TransactionType;
@@ -36,15 +39,17 @@ class TransactionService
      * @throws UserGatewayPermissionException
      * @throws GatewayTransactionTypePermissionException
      * @throws InvalidTransactionTypeException
+     * @throws UnknownProperties
      */
-    public function execute_transaction(array $data): array
+    public function execute_transaction(CreateTransactionRequest $request): array
     {
         User::canUseGateway($this->requested_gateway);
         Gateway::canUseTransactionType($this->requested_gateway, $this->requested_transaction_type);
 
-        $transaction = Transaction::create($data);
+        $transaction = Transaction::create($request->toDto()->toArray());
 
         [ $auth_error, $access_token ] = $this->gateway->authenticate()->toArray();
+
         /** @phpstan-ignore-next-line  */
         if ($auth_error) throw new GatewayAuthFailureException($transaction->id, $auth_error);
 
@@ -54,12 +59,14 @@ class TransactionService
             $gateway_transaction_id,
             $gateway_transaction_status
 
-        ] = $this->gatewayTransaction($access_token, $data);
+        ] = $this->executeGatewayTransaction($access_token, $request->all());
+
         /** @phpstan-ignore-next-line  */
         if ($transaction_error) throw new TransactionFailureException($transaction->id, $transaction_error);
 
         /** @phpstan-ignore-next-line  */
         Transaction::update_transaction_success($transaction->id, $transaction_data, $gateway_transaction_id, $gateway_transaction_status);
+
         return $transaction_data;
     }
 
@@ -82,10 +89,12 @@ class TransactionService
         Gateway::canUseTransactionType($this->requested_gateway, $this->requested_transaction_type);
 
         [ $auth_error, $access_token ] = ($this->gateway->authenticate())->toArray();
+
         /** @phpstan-ignore-next-line  */
         if ($auth_error) throw new GatewayAuthFailureException($transaction->id, $auth_error);
 
-        [ $transaction_error, $transaction_data ] = $this->gatewayTransaction($access_token, $data);
+        [ $transaction_error, $transaction_data ] = $this->executeGatewayTransaction($access_token, $data);
+
         /** @phpstan-ignore-next-line  */
         if ($transaction_error) throw new CheckStatusTransactionException($transaction->id, $transaction_error);
 
@@ -98,7 +107,7 @@ class TransactionService
      * @return array<mixed>
      * @throws InvalidTransactionTypeException
      */
-    protected function gatewayTransaction(string $access_token, array $data): array
+    protected function executeGatewayTransaction(string $access_token, array $data): array
     {
         $transaction_type = $this->requested_transaction_type->description;
         $methodName = Str::replace('-', '_', $transaction_type);

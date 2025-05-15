@@ -1,37 +1,31 @@
 <?php
 
 use App\Http\Controllers\Api\v1\TransactionController;
+use App\Http\Requests\Api\v1\Transaction\CreateTransactionRequest;
+use App\Http\Requests\Api\v1\Transaction\CheckTransactionRequest;
 use Illuminate\Support\Facades\Route;
-
-use App\Http\Requests\Api\v1\Transaction\BoletoRequest;
-use App\Http\Requests\Api\v1\Transaction\ConsultaPixRequest;
-use App\Http\Requests\Api\v1\Transaction\PixImediatoRequest;
-use App\Http\Requests\Api\v1\Transaction\PixVencimentoRequest;
-use App\Http\Requests\Api\v1\Transaction\CheckoutDebitoRequest;
-use App\Http\Requests\Api\v1\Transaction\ConsultaBoletoRequest;
-use App\Http\Requests\Api\v1\Transaction\CheckoutCreditoRequest;
 
 Route::prefix('transaction')->group(function () {
 
-    Route::put('/pix-imediato', function (PixImediatoRequest $request) {
+    Route::put('/pix-imediato', function (CreateTransactionRequest $request) {
         return app(TransactionController::class)->execute_transaction($request);
     });
-    Route::put('/pix-vencimento', function (PixVencimentoRequest $request) {
+    Route::put('/pix-vencimento', function (CreateTransactionRequest $request) {
         return app(TransactionController::class)->execute_transaction($request);
     });
-    Route::put('/boleto', function (BoletoRequest $request) {
+    Route::put('/boleto', function (CreateTransactionRequest $request) {
         return app(TransactionController::class)->execute_transaction($request);
     });
-    Route::put('/checkout-credito', function (CheckoutCreditoRequest $request) {
+    Route::put('/checkout-credito', function (CreateTransactionRequest $request) {
         return app(TransactionController::class)->execute_transaction($request);
     });
-    Route::put('/checkout-debito', function (CheckoutDebitoRequest $request) {
+    Route::put('/checkout-debito', function (CreateTransactionRequest $request) {
         return app(TransactionController::class)->execute_transaction($request);
     });
-    Route::put('/consulta-pix', function (ConsultaPixRequest $request) {
+    Route::put('/consulta-pix', function (CheckTransactionRequest $request) {
         return app(TransactionController::class)->check_transaction($request);
     });
-    Route::put('/consulta-boleto', function (ConsultaBoletoRequest $request) {
+    Route::put('/consulta-boleto', function (CheckTransactionRequest $request) {
         return app(TransactionController::class)->check_transaction($request);
     });
 });

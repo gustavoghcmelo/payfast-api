@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api\v1;
 
+use App\Http\Requests\Api\v1\Transaction\CreateTransactionRequest;
+use Spatie\DataTransferObject\Exceptions\UnknownProperties;
 use App\Exceptions\TransactionNotFoundException;
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
@@ -22,17 +24,18 @@ class TransactionController extends Controller
     ) {}
 
     /**
-     * @param FormRequest $request
+     * @param CreateTransactionRequest $request
      * @return JsonResponse
      * @throws GatewayAuthFailureException
      * @throws GatewayTransactionTypePermissionException
      * @throws InvalidTransactionTypeException
      * @throws TransactionFailureException
      * @throws UserGatewayPermissionException
+     * @throws UnknownProperties
      */
-    public function execute_transaction(FormRequest $request): JsonResponse
+    public function execute_transaction(CreateTransactionRequest $request): JsonResponse
     {
-        return ApiResponse::success($this->transaction_service->execute_transaction($request->all()));
+        return ApiResponse::success($this->transaction_service->execute_transaction($request));
     }
 
     /**

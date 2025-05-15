@@ -8,6 +8,7 @@ use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Database\QueryException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Spatie\DataTransferObject\Exceptions\UnknownProperties;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Auth\AuthenticationException;
 use App\Helpers\ApiResponse;
@@ -63,6 +64,24 @@ return Application::configure(basePath: dirname(__DIR__))
 
             if ($request->is('api/*')) {
                 return ApiResponse::error($exception->getMessage(), [], Response::HTTP_UNAUTHORIZED);
+            }
+        });
+
+        $exceptions->render(function (UnknownProperties $exception, Request $request) {
+
+            Log::channel('transaction')->error($exception->getMessage(), $request->all());
+
+            if ($request->is('api/*')) {
+                return ApiResponse::error($exception->getMessage(), [], Response::HTTP_BAD_REQUEST);
+            }
+        });
+
+        $exceptions->render(function (TypeError $exception, Request $request) {
+
+            Log::channel('transaction')->error($exception->getMessage(), $request->all());
+
+            if ($request->is('api/*')) {
+                return ApiResponse::error($exception->getMessage(), [], Response::HTTP_BAD_REQUEST);
             }
         });
 
